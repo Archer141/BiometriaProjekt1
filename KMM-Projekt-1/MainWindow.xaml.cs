@@ -59,7 +59,7 @@ namespace KMM_Projekt_1
                        { 32, 16, 8 } // of this pixel
                        
                                    };
-        public static int deletion = 0;
+        public static int deletion = 1;
 
 
         #region Konwertery bitmap
@@ -136,31 +136,32 @@ namespace KMM_Projekt_1
 
             int[,] tab = new int[bitmap.Height,bitmap.Width];
 
-            for (int i = 0; i < bitmap.Width; i++)
+            for (int i = 0; i < bitmap.Height; i++)
             {
-                for (int j = 0; j < bitmap.Height; j++)
+                for (int j = 0; j < bitmap.Width; j++)
                 {
                     int value;
-                    Color pixelColor = bitmap.GetPixel(i, j);
+                    Color pixelColor = bitmap.GetPixel(j, i);
 
                     value = (pixelColor.R + pixelColor.G + pixelColor.B) / 3;
 
-                    r = border[value];
-                    g = border[value];
-                    b = border[value];
-
-
-                    bitmap.SetPixel(i, j, Color.FromArgb(r, g, b));
-                    if (pixelColor.R==0)
+                    if (value < treshold)
                     {
+                        r = 0;
+                        g = 0;
+                        b = 0;
                         tab[i, j] = 1;
-
                     }
                     else
                     {
+                        r = 255;
+                        g = 255;
+                        b = 255;
                         tab[i, j] = 0;
-
                     }
+
+
+                    bitmap.SetPixel(j, i, Color.FromArgb(r, g, b));
                 }
             }
 
@@ -278,9 +279,8 @@ namespace KMM_Projekt_1
             return pixelArray ;
         }
 
-        public static int[,] DeletingTwoThree(Bitmap newImage, int[,] pixelArray)
+        public int[,] DeletingTwoThree(Bitmap newImage, int[,] pixelArray)
         {
-            int deletion = 0;
             int yArray, xArray, maskY, maskX;
             int sum = 0;
             int N = 2;
@@ -321,6 +321,7 @@ namespace KMM_Projekt_1
                 }
                 N++;
             }
+            RefreshImage3(pixelArray, newImage);
             return pixelArray;
         }
 
@@ -333,19 +334,50 @@ namespace KMM_Projekt_1
             int[,] pixelArray = new int[ bitmap.Height,bitmap.Width];
 
             pixelArray = Binarization(Int32.Parse(BinValue.Text));
-
             while (deletion != 0)
             {
-
                 deletion = 0;
-
                 pixelArray = SetOneTwoThree(bitmap, pixelArray);
                 pixelArray = FindAndDeleteFour(bitmap, pixelArray);
                 pixelArray = DeletingTwoThree(bitmap, pixelArray);
-
-                deletion = deletionFirst > deletionSecond ? deletionFirst : deletionSecond;
+                RefreshImage3(pixelArray, bitmap);
+                Refresh(Image3);
             }
+            deletion = 1;
+        }
 
+        private void RefreshImage3(int[,] pixelArray, Bitmap bitmap)
+        {
+            Image3.Source = WriteableBitmapBitmapFromBitmap(PixelArrayToImage(pixelArray, bitmap));
+        }
+
+        private Bitmap PixelArrayToImage(int[,]pixelArray,Bitmap bitmap)
+        {
+            Bitmap newBitmap = new Bitmap(bitmap);
+            for(int i = 0; i < bitmap.Height; i++)
+            {
+                for(int j = 0; j < bitmap.Width; j++)
+                {
+                    if (pixelArray[i, j] != 0)
+                    {
+                        bitmap.SetPixel(j, i, Color.Black);
+
+                    }
+                    else
+                    {
+                        bitmap.SetPixel(j, i, Color.White);
+                    }
+                }
+            }
+            return newBitmap;
+        }
+
+        private delegate void NoArgDelegate();
+
+        public static void Refresh(DependencyObject obj)
+        {
+            obj.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
+                (NoArgDelegate)delegate { });
         }
 
     }
