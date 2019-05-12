@@ -28,6 +28,7 @@ namespace KMM_Projekt_1
         
         private WriteableBitmap loadedImage;
         private BitmapImage bitmapImage;
+        private Bitmap bitmapImage3;
 
         public MainWindow()
         {
@@ -344,6 +345,7 @@ namespace KMM_Projekt_1
                 Refresh(Image3);
             }
             deletion = 1;
+            bitmapImage3 = bitmap;
         }
 
         private void RefreshImage3(int[,] pixelArray, Bitmap bitmap)
@@ -378,6 +380,92 @@ namespace KMM_Projekt_1
         {
             obj.Dispatcher.Invoke(System.Windows.Threading.DispatcherPriority.ApplicationIdle,
                 (NoArgDelegate)delegate { });
+        }
+
+        int[] minuncje = { 1, 3 };
+        private int minuncja(int x, int y, int[,] t)
+        {
+            int suma = 0;
+            suma += Math.Abs(t[x, y + 1] - t[x - 1, y + 1]);
+            suma += Math.Abs(t[x - 1, y + 1] - t[x - 1, y]);
+            suma += Math.Abs(t[x - 1, y] - t[x - 1, y - 1]);
+            suma += Math.Abs(t[x - 1, y - 1] - t[x, y - 1]);
+            suma += Math.Abs(t[x, y - 1] - t[x + 1, y - 1]);
+            suma += Math.Abs(t[x + 1, y - 1] - t[x + 1, y]);
+            suma += Math.Abs(t[x + 1, y] - t[x + 1, y + 1]);
+            suma += Math.Abs(t[x + 1, y + 1] - t[x, y + 1]);
+
+            suma /= 2;
+            if (suma == minuncje[0]) return 1;
+            if (suma == minuncje[1]) return 2;
+            return 0;
+
+        }
+
+        private void MinucjeBtn_Click(object sender, EventArgs e)
+        {
+
+            Bitmap bitmap = bitmapImage3;
+            int[,] minuncje = new int[bitmap.Width, bitmap.Height];
+            Bitmap tmp = new Bitmap(bitmap.Width, bitmap.Height);
+            int[,] pixelArray = new int[bitmap.Width, bitmap.Height];
+
+            Color color;
+            for (int i = 1; i < bitmap.Width - 1; i++) // zwykłe uzupełnienie tabliicy 0 i 1 do liczenia minuncji
+            {
+                for (int j = 1; j < bitmap.Height - 1; j++)
+                {
+                    color = bitmap.GetPixel(i, j);
+                    tmp.SetPixel(i, j, color);
+                    pixelArray[i, j] = 0;
+                    if (color.R != 255)
+                    {
+                        pixelArray[i, j] = 1;
+                    }
+                }
+            }
+            for (int i = 1; i < bitmap.Width - 1; i++)   //liczenie minuncji i zaznaczenie
+            {
+                for (int j = 1; j < bitmap.Height - 1; j++)
+                {
+                    minuncje[i, j] = 0;
+                    if (pixelArray[i, j] == 1) //jezeli to czarny pixel
+                    {
+                        if (minuncja(i, j, pixelArray) == 1) // zakonczenia
+                        {
+                            minuncje[i, j] = 1;
+                            for (int k = i - 3; k < i + 4; k++)
+                            {
+                                for (int l = j - 3; l < j + 4; l++)
+                                {
+                                    if (k == i - 3 || l == j - 3 || k == i + 3 || l == j + 3)
+                                    {
+                                        tmp.SetPixel(k, l, Color.Red);
+                                    }
+                                }
+                            }
+                        }
+                        if (minuncja(i, j, pixelArray) == 2) //rozwidlenia
+                        {
+                            minuncje[i, j] = 2;
+                            for (int k = i - 3; k < i + 4; k++)
+                            {
+                                for (int l = j - 3; l < j + 4; l++)
+                                {
+                                    if (k == i - 3 || l == j - 3 || k == i + 3 || l == j + 3)
+                                    {
+                                        tmp.SetPixel(k, l, Color.Blue);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+
+                }
+            }
+            Image4.Source = WriteableBitmapBitmapFromBitmap(tmp);
+           
         }
 
     }

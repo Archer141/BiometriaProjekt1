@@ -11,6 +11,7 @@
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
             <ColumnDefinition></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="9*"></RowDefinition>
@@ -19,6 +20,7 @@
         <Image Grid.Column="0" Name="Image1" Margin="10"></Image>
         <Image Grid.Column="1" Name="Image2" Margin="10"></Image>
         <Image Grid.Column="2" Name="Image3" Margin="10"></Image>
+        <Image Grid.Column="3" Name="Image4" Margin="10"></Image>
         <Grid Grid.Column="0" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition></ColumnDefinition>
@@ -35,6 +37,9 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Row="1" Grid.Column="0" Margin="15" Name="binarBtn" Click="BinaryzationClick">Binaryzation</Button>
             <TextBox Grid.Row="1" Grid.Column="1" Margin="15" Name="BinValue" TextAlignment="Center" >150</TextBox>
+        </Grid>
+        <Grid Grid.Column="2" Grid.Row="1">
+            <Button Grid.Row="1" Grid.Column="0" Margin="15" Name="minucjeBtn" Click="MinucjeBtn_Click">Minucje</Button>
         </Grid>
     </Grid>
 </Window>
