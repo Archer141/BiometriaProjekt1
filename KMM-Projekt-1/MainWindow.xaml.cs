@@ -184,11 +184,11 @@ namespace KMM_Projekt_1
 
         #region Kmm
 
-        public static int[,] SetOneTwoThree(Bitmap newImage, int[,] pixelArray)
+        public static int[,] SetTwoThree(Bitmap newImage, int[,] pixelArray)
         {
             int yArray, xArray, maskY, maskX;
-            int checkStick = 0;
-            int checkClose = 0;
+            int checkDiagonal = 0;
+            int checkPlus = 0;
 
             for (int y = 1; y < newImage.Height - 1; y++)
             {
@@ -207,23 +207,23 @@ namespace KMM_Projekt_1
                                 {
                                     if (pixelArray[yArray, xArray] == 0)
                                     {
-                                        checkStick = 1;
+                                        checkDiagonal = 1;
                                     }
                                 }
                                 else if (pixelArray[yArray, xArray] == 0)
-                                    checkClose = 1;
+                                    checkPlus = 1;
                             }
                         }
-                        if (checkStick == 1 && checkClose == 0)
+                        if (checkDiagonal == 1 && checkPlus == 0)
                             pixelArray[y, x] = 3;
                         else
                             pixelArray[y, x] = 2;
 
-                        if (checkStick == 0 && checkClose == 0)
+                        if (checkDiagonal == 0 && checkPlus == 0)
                             pixelArray[y, x] = 1;
 
-                        checkClose = 0;
-                        checkStick = 0;
+                        checkPlus = 0;
+                        checkDiagonal = 0;
                     }
                 }
             }
@@ -234,7 +234,7 @@ namespace KMM_Projekt_1
         public static int[,] FindAndDeleteFour(Bitmap newImage, int[,] pixelArray)
         {
             int yArray, xArray, maskY, maskX;
-            int check = 0;
+            int neighbourCounter = 0;
             int sum = 0;
             for (int y = 1; y < newImage.Height - 1; y++)
             {
@@ -254,26 +254,26 @@ namespace KMM_Projekt_1
 
                                 if (pixelArray[yArray, xArray] > 0)
                                 {
-                                    check++; //counting neighbours for that pixel
-                                    sum +=  compareTab[maskY, maskX]; //summary according to compareTable
+                                    neighbourCounter++; 
+                                    sum +=  compareTab[maskY, maskX]; 
                                 }
 
                             }
                         }
-                        if (check == 2 || check == 3 || check == 4)
+                        if (neighbourCounter == 2 || neighbourCounter == 3 || neighbourCounter == 4)
                         {
                             if (delTab.Contains(sum))
                             {
                                 deletion++;
-                                pixelArray[y, x] = 0; // we are find "4" and setting it to "0" at the same time
+                                pixelArray[y, x] = 0; 
                             }
                         }
                         else
                         {
-                            pixelArray[y, x] = 2; // if we not find any "4"
+                            pixelArray[y, x] = 2; 
                         }
                     }
-                    check = 0;
+                    neighbourCounter = 0;
                     sum = 0;
                 }
             }
@@ -300,9 +300,9 @@ namespace KMM_Projekt_1
                                     yArray = (y + maskY - 1);
                                     xArray = (x + maskX - 1);
 
-                                    if (pixelArray[yArray, xArray] != 0)
+                                    if (pixelArray[yArray, xArray] > 0)
                                     {
-                                        sum += compareTab[maskY, maskX]; //summary according to compareTable
+                                        sum += compareTab[maskY, maskX];
                                     }
                                 }
                             }
@@ -310,7 +310,7 @@ namespace KMM_Projekt_1
                             if (delTab.Contains(sum))
                             {
                                 deletion++;
-                                pixelArray[y, x] = 0; //if we find pixel to delete, we are deleting it setting it to 0
+                                pixelArray[y, x] = 0; 
                             }
                             else
                             {
@@ -322,7 +322,7 @@ namespace KMM_Projekt_1
                 }
                 N++;
             }
-            RefreshImage3(pixelArray, newImage);
+           
             return pixelArray;
         }
 
@@ -335,10 +335,11 @@ namespace KMM_Projekt_1
             int[,] pixelArray = new int[ bitmap.Height,bitmap.Width];
 
             pixelArray = Binarization(Int32.Parse(BinValue.Text));
+
             while (deletion != 0)
             {
                 deletion = 0;
-                pixelArray = SetOneTwoThree(bitmap, pixelArray);
+                pixelArray = SetTwoThree(bitmap, pixelArray);
                 pixelArray = FindAndDeleteFour(bitmap, pixelArray);
                 pixelArray = DeletingTwoThree(bitmap, pixelArray);
                 RefreshImage3(pixelArray, bitmap);
@@ -406,7 +407,6 @@ namespace KMM_Projekt_1
         {
 
             Bitmap bitmap = bitmapImage3;
-            int[,] minuncje = new int[bitmap.Width, bitmap.Height];
             Bitmap tmp = new Bitmap(bitmap.Width, bitmap.Height);
             int[,] pixelArray = new int[bitmap.Width, bitmap.Height];
 
@@ -428,12 +428,10 @@ namespace KMM_Projekt_1
             {
                 for (int j = 1; j < bitmap.Height - 1; j++)
                 {
-                    minuncje[i, j] = 0;
                     if (pixelArray[i, j] == 1) //jezeli to czarny pixel
                     {
                         if (minuncja(i, j, pixelArray) == 1) // zakonczenia
                         {
-                            minuncje[i, j] = 1;
                             for (int k = i - 3; k < i + 4; k++)
                             {
                                 for (int l = j - 3; l < j + 4; l++)
@@ -447,7 +445,6 @@ namespace KMM_Projekt_1
                         }
                         if (minuncja(i, j, pixelArray) == 2) //rozwidlenia
                         {
-                            minuncje[i, j] = 2;
                             for (int k = i - 3; k < i + 4; k++)
                             {
                                 for (int l = j - 3; l < j + 4; l++)
